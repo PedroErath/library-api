@@ -2,10 +2,16 @@ const express = require('express')
 const router = express.Router()
 
 const Book = require('../models/Book')
+const Author = require('../models/Author')
 
 router.get('/filter', async (req, res) => {
     try {
-        const books = await Book.find(req.body)
+        if (req.body.author) {
+            const author = await Author.findOne({ name: req.body.author })
+            req.body.author = author?._id
+        }
+
+        const books = await Book.find(req.body).populate('author').exec()
 
         res.json({ books })
     } catch (error) {
@@ -19,7 +25,7 @@ router.get('/filter', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params
-        const book = await Book.findById(id)
+        const book = await Book.findById(id).populate('author').exec()
 
         res.json(book)
     } catch (error) {
@@ -32,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const books = await Book.find({})
+        const books = await Book.find().populate('author').exec()
 
         res.json({ books })
     } catch (error) {
@@ -45,7 +51,6 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-
         const checkBookExist = await Book.findOne({ title: req.body.title, publishCompany: req.body.publishCompany })
 
         if (!checkBookExist) {
@@ -77,7 +82,7 @@ router.put('/:id', async (req, res) => {
             res.json({
                 bookUpdated
             })
-        }else{
+        } else {
             res.json({
                 error: true,
                 message: 'This book already exist'

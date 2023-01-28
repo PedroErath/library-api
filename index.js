@@ -11,7 +11,7 @@ const app = express()
 app.use(express.json())
 
 app.use('/books', booksRoute)
-app.use('/autors', authorsRoute)
+app.use('/authors', authorsRoute)
 
 app.use('/', (req, res) => {
     res.send('Curso de node')
