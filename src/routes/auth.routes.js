@@ -8,28 +8,30 @@ const User = require('../models/User')
 
 router.post('/login', async (req, res) => {
     try {
-        const user = await User.findOne({email: req.body.email})
+        const user = await User.findOne({ email: req.body.email })
 
-        if(user){
+        if (user) {
             const passwordOk = bcrypt.compareSync(req.body.password, user.password)
 
-            if(passwordOk){
-                const token = jwt.sign({_id: user._id, type: user.type}, process.env.TOKEN_SECRET, {expiresIn: '1800s'})
-            
+            if (passwordOk) {
+                const refreshToken = jwt.sign({ _id: user._id, type: user.type }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
+                const token = jwt.sign({ refreshToken }, process.env.TOKEN_SECRET, { expiresIn: '900s' })
+
                 res.json({
                     error: false,
+                    refreshToken: refreshToken,
                     token: token
-                })                
-            }else{
+                })
+            } else {
                 res.json({
                     error: true,
                     message: 'Invalid password'
                 })
             }
-        }else{
+        } else {
             res.json({
                 error: true,
-                message:'User does not exist'
+                message: 'User does not exist'
             })
         }
     } catch (error) {
@@ -40,15 +42,29 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/verifytoken', async (req, res) => {
+router.post('/verifytoken', (req, res) => {
     try {
-        const token = req.headers.authorization.split(' ')[1]
-        const userWithTokenOK = jwt.verify(token, process.env.TOKEN_SECRET)
+        const { refreshToken } = req.body
+        const userWithTokenOK = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
         res.json({
             error: false,
             user: userWithTokenOK
         })
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            message: error.message
+        })
+    }
+})
+
+router.post('/refreshtoken', (req, res) => {
+    try {
+        const { refreshToken } = req.body
+        const token = jwt.sign({ refreshToken }, process.env.TOKEN_SECRET, { expiresIn: '900s' })
+
+        res.json({ token })
     } catch (error) {
         res.status(400).json({
             error: true,
