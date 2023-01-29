@@ -3,6 +3,7 @@ const router = express.Router()
 
 const Book = require('../models/Book')
 const Author = require('../models/Author')
+const authRoutes = require('../routes/auth.routes')
 
 router.get('/filter', async (req, res) => {
     try {
