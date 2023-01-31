@@ -17,6 +17,10 @@ const book = mongoose.Schema({
     pages: {
         type: Number,
         default: 0
+    },
+    imageURL: {
+        type: String,
+        default: ''
     }
 })
 

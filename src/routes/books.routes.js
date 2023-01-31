@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
+const Multer = require('multer')
 
 const Book = require('../models/Book')
 const Author = require('../models/Author')
 const authRoutes = require('../routes/auth.routes')
+const uploadImage = require('../services/firebase')
+const multer = Multer({ storage: Multer.memoryStorage(), limits: { fileSize: 5000000 } })
 
 router.get('/filter', async (req, res) => {
     try {
@@ -50,7 +53,14 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', multer.single('image'), uploadImage, async (req, res) => {
+
+    const {error} = req.body
+
+    if (error) res.json({
+        error: true,
+        message: error
+    })
     try {
         const checkBookExist = await Book.findOne({ title: req.body.title, publishCompany: req.body.publishCompany })
 
@@ -70,6 +80,7 @@ router.post('/', async (req, res) => {
         })
     }
 })
+
 
 router.put('/:id', async (req, res) => {
 
