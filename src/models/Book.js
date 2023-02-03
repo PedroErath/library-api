@@ -18,6 +18,14 @@ const book = mongoose.Schema({
         type: Number,
         default: 0
     },
+    releaseDate: {
+        type: Date,
+        required: true
+    },
+    categoty: {
+        type: String,
+        required: true
+    },
     imageURL: {
         type: String,
         default: ''
