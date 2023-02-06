@@ -11,16 +11,13 @@ const book = mongoose.Schema({
         required: true
     },
     publishCompany: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     pages: {
         type: Number,
         default: 0
-    },
-    releaseDate: {
-        type: Date,
-        required: true
     },
     categoty: {
         type: String,

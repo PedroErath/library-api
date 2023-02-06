@@ -15,11 +15,16 @@ const user = mongoose.Schema({
     },
     type:{
         type: String,
-        enum: ['A', 'E'],
-        default: 'E'
+        enum: ['A', 'E', 'C'],
+        default: 'C'
     },
-    phoneNumber:{
-        type: String
+    favoriteBooks:{
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Book'
+    },
+    imageURL: {
+        type: String,
+        default: ''
     }
 })
 
