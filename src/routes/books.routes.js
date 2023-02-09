@@ -6,6 +6,7 @@ const Book = require('../models/Book')
 const Author = require('../models/Author')
 const authRoutes = require('../routes/auth.routes')
 const uploadImage = require('../services/firebase')
+const authMiddleware = require('../middlewares/authMiddleware')
 const multer = Multer({ storage: Multer.memoryStorage(), limits: { fileSize: 5000000 } })
 
 router.get('/filter', async (req, res) => {
@@ -40,7 +41,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const books = await Book.find().populate('author').exec()
 
@@ -112,7 +113,15 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params
         const bookDeleted = await Book.findByIdAndDelete(id)
-        res.json({ error: false })
+
+        if(!bookDeleted){
+            res.status(400).json({
+                error: true,
+                message: 'Book not found'
+            })
+        }else{
+            res.json({ error: false })
+        }
     } catch (error) {
         res.status(400).json({
             error: true,

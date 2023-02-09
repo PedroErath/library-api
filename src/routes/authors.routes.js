@@ -94,7 +94,16 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params
         const AuthorDeleted = await Author.findByIdAndDelete(id)
-        res.json({ error: false })
+
+        if(!AuthorDeleted){
+            res.status(400).json({
+                error: true,
+                message: 'Author not found'
+            })
+        }else{
+            res.json({ error: false })
+        }
+    
     } catch (error) {
         res.status(400).json({
             error: true,

@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
                     type: req.body.type
                 }).save()
                 res.json({ savedUser })
-            }else{
+            } else {
                 res.json({
                     error: true,
                     message: 'The password must have a minimum of 8 characters and a maximum of 64, with numbers, letters and a special character'
@@ -114,23 +114,23 @@ router.put('/:id', async (req, res) => {
 router.put('/favoritebook/:id', async (req, res) => {
     try {
         const { id } = req.params
-        
+
         const books = await User.findById(id).select('favoriteBooks')
-        
+
         const bookIsFavorite = books.favoriteBooks.find(book => book == req.body.favoriteBooks)
 
-        if(bookIsFavorite){
-            const delFavoritedBook = await User.findByIdAndUpdate(id, {$pull: {favoriteBooks: { $in: req.body.favoriteBooks}}}, { 'returnDocument': 'after'})
+        if (bookIsFavorite) {
+            const delFavoritedBook = await User.findByIdAndUpdate(id, { $pull: { favoriteBooks: { $in: req.body.favoriteBooks } } }, { 'returnDocument': 'after' })
             res.json({
                 delFavoritedBook
             })
-        }else{
-            const addFavoritedBook = await User.findByIdAndUpdate(id, {$push: req.body}, { 'returnDocument': 'after'})
+        } else {
+            const addFavoritedBook = await User.findByIdAndUpdate(id, { $push: req.body }, { 'returnDocument': 'after' })
             res.json({
                 addFavoritedBook
             })
         }
-                
+
     } catch (error) {
         res.status(400).json({
             error: true,
@@ -143,7 +143,15 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params
         const userDeleted = await User.findByIdAndDelete(id)
-        res.json({ error: false })
+
+        if(!userDeleted){
+            res.status(400).json({
+                error: true,
+                message: 'User not found'
+            })
+        }else{
+            res.json({ error: false })
+        }
     } catch (error) {
         res.status(400).json({
             error: true,

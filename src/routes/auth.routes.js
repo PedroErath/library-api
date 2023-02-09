@@ -17,6 +17,8 @@ router.post('/login', async (req, res) => {
                 const refreshToken = jwt.sign({ _id: user._id, type: user.type }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
                 const token = jwt.sign({ refreshToken }, process.env.TOKEN_SECRET, { expiresIn: '900s' })
 
+                const saveRefreshToken = await User.findByIdAndUpdate(user._id, {refreshToken})
+
                 res.json({
                     error: false,
                     refreshToken: refreshToken,
