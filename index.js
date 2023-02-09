@@ -16,10 +16,6 @@ app.use('/authors', authorsRoute)
 app.use('/users', usersRoute)
 app.use('/auth', authRoute) 
 
-app.use('/', (req, res) => {
-    res.send('Curso de node')
-})
-
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running in port: ${process.env.PORT}`)

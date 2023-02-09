@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
         })
 
         const userWithTokenOK = jwt.verify(token, process.env.TOKEN_SECRET)
-        next()
+        userWithTokenOK && next()
     } catch (error) {
         res.status(400).json({
             error: true,

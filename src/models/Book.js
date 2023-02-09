@@ -15,9 +15,10 @@ const book = mongoose.Schema({
         ref: 'User',
         required: true
     },
-    pages: {
+    price: {
         type: Number,
-        default: 0
+        default: 0,
+        required: true
     },
     categoty: {
         type: String,
@@ -25,7 +26,8 @@ const book = mongoose.Schema({
     },
     imageURL: {
         type: String,
-        default: ''
+        default: '',
+        required: true
     }
 })
 

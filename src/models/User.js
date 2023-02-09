@@ -20,7 +20,8 @@ const user = mongoose.Schema({
     },
     favoriteBooks:{
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'Book'
+        ref: 'Book',
+        default: []
     },
     imageURL: {
         type: String,

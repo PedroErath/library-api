@@ -111,6 +111,34 @@ router.put('/:id', async (req, res) => {
     }
 })
 
+router.put('/favoritebook/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        
+        const books = await User.findById(id).select('favoriteBooks')
+        
+        const bookIsFavorite = books.favoriteBooks.find(book => book == req.body.favoriteBooks)
+
+        if(bookIsFavorite){
+            const delFavoritedBook = await User.findByIdAndUpdate(id, {$pull: {favoriteBooks: { $in: req.body.favoriteBooks}}}, { 'returnDocument': 'after'})
+            res.json({
+                delFavoritedBook
+            })
+        }else{
+            const addFavoritedBook = await User.findByIdAndUpdate(id, {$push: req.body}, { 'returnDocument': 'after'})
+            res.json({
+                addFavoritedBook
+            })
+        }
+                
+    } catch (error) {
+        res.status(400).json({
+            error: true,
+            message: error.message
+        })
+    }
+})
+
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params
