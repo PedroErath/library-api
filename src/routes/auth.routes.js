@@ -14,14 +14,10 @@ router.post('/login', async (req, res) => {
             const passwordOk = bcrypt.compareSync(req.body.password, user.password)
 
             if (passwordOk) {
-                const refreshToken = jwt.sign({ _id: user._id, type: user.type }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '24h' })
-                const token = jwt.sign({ refreshToken }, process.env.TOKEN_SECRET, { expiresIn: '900s' })
-
-                const saveRefreshToken = await User.findByIdAndUpdate(user._id, {refreshToken})
+                const token = jwt.sign({id: user._id, type: user.type}, process.env.TOKEN_SECRET, { expiresIn: '24h' })
 
                 res.json({
                     error: false,
-                    refreshToken: refreshToken,
                     token: token
                 })
             } else {
@@ -46,27 +42,13 @@ router.post('/login', async (req, res) => {
 
 router.post('/verifytoken', (req, res) => {
     try {
-        const { refreshToken } = req.body
-        const userWithTokenOK = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+        const { token } = req.body
+        const userWithTokenOK = jwt.verify(token, process.env.TOKEN_SECRET)
 
         res.json({
             error: false,
             user: userWithTokenOK
         })
-    } catch (error) {
-        res.status(400).json({
-            error: true,
-            message: error.message
-        })
-    }
-})
-
-router.post('/refreshtoken', (req, res) => {
-    try {
-        const { refreshToken } = req.body
-        const token = jwt.sign({ refreshToken }, process.env.TOKEN_SECRET, { expiresIn: '900s' })
-
-        res.json({ token })
     } catch (error) {
         res.status(400).json({
             error: true,

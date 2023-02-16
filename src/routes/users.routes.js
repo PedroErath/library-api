@@ -5,7 +5,7 @@ const authMiddleware = require('../middlewares/authMiddleware')
 
 const User = require('../models/User')
 
-router.get('/filter', async (req, res) => {
+router.get('/filter', authMiddleware, async (req, res) => {
     try {
         const users = await User.find(req.body)
 
@@ -18,11 +18,12 @@ router.get('/filter', async (req, res) => {
     }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params
         const user = await User.findById(id)
 
+        res.set('teste', user._id)
         res.json(user)
     } catch (error) {
         res.status(400).json({
@@ -32,7 +33,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const users = await User.find()
 
@@ -111,7 +112,7 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-router.put('/favoritebook/:id', async (req, res) => {
+router.put('/favoritebook/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params
 
@@ -139,7 +140,7 @@ router.put('/favoritebook/:id', async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params
         const userDeleted = await User.findByIdAndDelete(id)

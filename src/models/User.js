@@ -26,10 +26,6 @@ const user = mongoose.Schema({
     imageURL: {
         type: String,
         default: ''
-    },
-    refreshToken: {
-        type: String,
-        default: ''
     }
 })
 
