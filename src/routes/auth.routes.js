@@ -14,7 +14,7 @@ router.post('/login', async (req, res) => {
             const passwordOk = bcrypt.compareSync(req.body.password, user.password)
 
             if (passwordOk) {
-                const token = jwt.sign({id: user._id, type: user.type}, process.env.TOKEN_SECRET, { expiresIn: '24h' })
+                const token = jwt.sign({id: user._id, type: user.type, name:user.name}, process.env.TOKEN_SECRET, { expiresIn: '24h' })
 
                 res.json({
                     error: false,
