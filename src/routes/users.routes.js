@@ -148,7 +148,7 @@ router.put('/favoritebook/:id', authMiddleware, async (req, res) => {
     }
 })
 
-router.put('/addbookincart/:id', authMiddleware, async (req, res) => {
+router.put('/handlebookincart/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params
 
@@ -156,11 +156,19 @@ router.put('/addbookincart/:id', authMiddleware, async (req, res) => {
 
         const bookIsInCart = books.booksInCart.find(book => book.book == req.body.book)
 
-        if (bookIsInCart) {
-            console.log('if')
+        if (bookIsInCart && req.body.action === 'pull') {          /* Verifica se o livro está no carrinho e a action passada é pull */
+            const delBookInCart = await User.findByIdAndUpdate(    /* Usei findById pois não preciso passar mais parâmetros na busca */
+                id,                                                /* Filtra pelo id do Usuário */
+                { $pull: {booksInCart: { 'book': req.body.book}}}, /* Remove do array o objeto com o id do livro passado pela req */
+                {'returnDocument': 'after'}                         /* Retorna o documento pós atualização */
+            )
+            res.json({
+                delBookInCart
+            })
+        } else if (bookIsInCart) {                                       /* Verifica se o livro está no carrinho */
             const addOneMoreBook = await User.findOneAndUpdate(          /* Usei o FindOne pois posso passar mais parâmetros de busca */
                 { _id: id, 'booksInCart.book': { $eq: req.body.book } }, /* Filtra pelo id do Usuário e pelo book dentro de booksInCart */
-                { $inc: { 'booksInCart.$.quantity': 1 } },               /* Incrementa 1 na quantidade se o livro ja existir no array */
+                { $inc: { 'booksInCart.$.quantity': req.body.action === 'dec' ? -1 : 1 } }, /* Decrementa 1 se for passado a action dec e incrementa se não for passado */
                 { 'returnDocument': 'after' }                            /*  retorna o documento pós atualização */
             )                                                            /*  */
             res.json({
@@ -169,7 +177,7 @@ router.put('/addbookincart/:id', authMiddleware, async (req, res) => {
         } else {
             const addBookInCart = await User.findByIdAndUpdate(                         /* Usei o FindById pois não preciso passar outro parâmetro na busca*/
                 id,                                                                     /* Filtra pelo id do Usuário*/
-                { $push: { booksInCart: { 'book': req.body.book, 'quantity': 1 } } },   /* adiciona o Id do livro vindo pela req e quantidade 1 pois o livro não existe no array */    
+                { $push: { booksInCart: { 'book': req.body.book, 'quantity': 1 } } },   /* adiciona o Id do livro vindo pela req e quantidade 1 pois o livro não existe no array */
                 { 'returnDocument': 'after' }                                           /*  retorna o documento pós atualização */
             )
             res.json({
@@ -184,7 +192,6 @@ router.put('/addbookincart/:id', authMiddleware, async (req, res) => {
         })
     }
 })
-
 
 router.delete('/:id', authMiddleware, async (req, res) => {
     try {
