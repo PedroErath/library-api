@@ -23,13 +23,13 @@ router.post('/login', async (req, res) => {
             } else {
                 res.json({
                     error: true,
-                    message: 'Invalid password'
+                    message: 'incorrect username or password'
                 })
             }
         } else {
             res.json({
                 error: true,
-                message: 'User does not exist'
+                message: 'incorrect username or password'
             })
         }
     } catch (error) {
